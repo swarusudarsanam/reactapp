@@ -1,6 +1,6 @@
 import { ClerkProvider } from '@clerk/expo'
 import { tokenCache } from '@clerk/expo/token-cache'
-import { Slot } from 'expo-router'
+import { Stack } from 'expo-router'
 import '../../global.css'
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
@@ -12,7 +12,12 @@ if (!publishableKey) {
 export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="sign-up" />
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </ClerkProvider>
   )
 }

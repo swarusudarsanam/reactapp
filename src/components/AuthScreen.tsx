@@ -1,4 +1,5 @@
 import { useAuth, useSignIn, useSignUp } from '@clerk/expo'
+import { Image } from 'expo-image'
 import { Link, Redirect, router } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -50,7 +51,7 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
   }
 
   if (isSignedIn) {
-    return <Redirect href="./(tabs)" />
+    return <Redirect href="/(tabs)" />
   }
 
   const handleSignUp = async () => {
@@ -104,7 +105,7 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
         return
       }
 
-      router.replace('./(tabs)')
+      router.replace('/(tabs)')
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -136,7 +137,7 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
         return
       }
 
-      router.replace('./(tabs)')
+      router.replace('/(tabs)')
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -149,6 +150,9 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
   }
 
   const handleSubmit = isSignUp ? handleSignUp : handleSignIn
+  const isButtonDisabled = isVerifying
+    ? code.trim().length === 0
+    : !emailAddress.trim() || !password
 
   return (
     <KeyboardAvoidingView
@@ -160,7 +164,12 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.brandMark}>
-          <Text style={styles.brandMarkText}>S</Text>
+          <Image
+            source={require('../../assets/images/homely.jpg')}
+            contentFit="fill"
+            style={styles.brandIconImage}
+            accessibilityLabel="Homely icon"
+          />
         </View>
         <Text style={styles.eyebrow}>YOUR SPACE, ALL IN ONE PLACE</Text>
         <Text style={styles.title}>
@@ -228,21 +237,12 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
 
           <Pressable
             accessibilityRole="button"
-            disabled={
-              isSubmitting ||
-              (isVerifying
-                ? code.trim().length === 0
-                : !emailAddress.trim() || !password)
-            }
+            disabled={isSubmitting || isButtonDisabled}
             onPress={isVerifying ? handleVerify : handleSubmit}
+            android_ripple={{ color: '#3349D1' }}
             style={({ pressed }) => [
               styles.primaryButton,
               pressed && styles.buttonPressed,
-              (isSubmitting ||
-                (isVerifying
-                  ? code.trim().length === 0
-                  : !emailAddress.trim() || !password)) &&
-                styles.buttonDisabled,
             ]}
           >
             {isSubmitting ? (
@@ -269,7 +269,7 @@ export default function AuthScreen({ mode }: AuthScreenProps) {
               {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
             </Text>
             <Link
-              href={isSignUp ? './sign-in' : '/'}
+              href={isSignUp ? '/sign-in' : '/sign-up'}
               style={styles.link}
               accessibilityRole="link"
             >
@@ -302,16 +302,17 @@ const styles = StyleSheet.create({
   brandMark: {
     width: 52,
     height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 17,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     marginBottom: 28,
+    overflow: 'hidden',
   },
-  brandMarkText: {
-    color: colors.white,
-    fontSize: 27,
-    fontWeight: '800',
+  brandIconImage: {
+    position: 'absolute',
+    width: 250,
+    height: 136,
+    left: -99,
+    top: -28,
   },
   eyebrow: {
     color: colors.primary,
@@ -352,12 +353,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   primaryButton: {
-    minHeight: 56,
+    width: '100%',
+    minHeight: 60,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
     backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: '#3149D8',
     marginTop: 4,
+    elevation: 3,
   },
   primaryButtonText: {
     color: colors.white,
@@ -365,10 +370,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   buttonPressed: {
-    opacity: 0.86,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.88,
+    transform: [{ scale: 0.99 }],
   },
   switchAuth: {
     flexDirection: 'row',
